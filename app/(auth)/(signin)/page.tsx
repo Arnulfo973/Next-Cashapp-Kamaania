@@ -2,7 +2,7 @@ import { SignInViewPage } from '@/sections/signin/view';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Kamaania',
+  title: 'Island House',
   description: ''
 };
 

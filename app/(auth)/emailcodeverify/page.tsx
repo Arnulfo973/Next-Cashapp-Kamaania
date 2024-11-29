@@ -2,7 +2,7 @@ import { EmailCodeVerifyPageView } from '@/sections/emailcodeverify/view';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Kamaania',
+  title: 'Island House',
   description: ''
 };
 

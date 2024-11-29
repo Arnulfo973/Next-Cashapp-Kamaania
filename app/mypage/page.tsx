@@ -1,8 +1,8 @@
-import RoleMiddleware from "@/components/rolemiddleware";
-import { Promotion } from "@/sections/promotion/views";
+import RoleMiddleware from '@/components/rolemiddleware';
+import { Promotion } from '@/sections/promotion/views';
 
 export const metadata = {
-  title: 'Kamaania'
+  title: 'Island House'
 };
 
 export default function page() {

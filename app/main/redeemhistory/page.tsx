@@ -9,7 +9,7 @@ type pageProps = {
 };
 
 export const metadata = {
-  title: 'Kamaania'
+  title: 'Island House'
 };
 
 export default async function Page({ searchParams }: pageProps) {
@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: pageProps) {
   searchParamsCache.parse(searchParams);
 
   return (
-    <RoleMiddleware accessRight='admin'>
+    <RoleMiddleware accessRight="admin">
       <RedeemHistoryListingPage />
     </RoleMiddleware>
   );

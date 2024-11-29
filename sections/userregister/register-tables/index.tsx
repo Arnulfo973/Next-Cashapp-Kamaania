@@ -1,5 +1,5 @@
 'use client';
-import { AdminRegisterUsers } from '@/constants/data';
+import { AdminRegisterUsers, UserRegister } from '@/constants/data';
 import { columns } from './columns';
 import { useState, useEffect } from 'react';
 import UserRegisterTableView from './user-register-table';
@@ -13,15 +13,15 @@ const userInfo = userInfoStr ? JSON.parse(userInfoStr) : {};
 
 export default function UserRegisterTable() {
   const router = useRouter();
-  const [data, setData] = useState<AdminRegisterUsers[]>([]);
-  const [totalData, setTotalData] = useState<number>(0); // Store total items for pagination
+  const [data, setData] = useState<AdminRegisterUsers[] & UserRegister[]>([]);
+  const [totalData, setTotalData] = useState<number>(0); 
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
         if (!userInfo.token) {
-          throw new Error("User not authenticated.");
+          throw new Error('User not authenticated.');
         }
 
         setLoading(true);
@@ -30,7 +30,7 @@ export default function UserRegisterTable() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userInfo.token}` // Assuming the token is sent this way
+            Authorization: `Bearer ${userInfo.token}`
           }
         });
 
@@ -39,9 +39,8 @@ export default function UserRegisterTable() {
         }
 
         const result = await response.json();
-        setData(result.data[0].register); // Adjust based on your API response
-        setTotalData(result.totalCount); // Adjust based on your API response
-        
+        setData(result.data[0].register); 
+        setTotalData(result.totalCount); 
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -53,24 +52,28 @@ export default function UserRegisterTable() {
   }, [userInfo]);
 
   if (loading) {
-    return <div>Loading...</div>; // Replace with a spinner or loading message if needed
+    return <div>Loading...</div>;
   }
 
   const requestSuccess = () => {
-    router.push("/mypage/promotion");
-  }
+    router.push('/mypage/promotion');
+  };
 
   return (
     <div className="space-y-4 ">
       <UserRegistrationForm />
       <Button
-        className='border p-6 ml-[20%] w-[60%] text-white'
+        className="ml-[20%] w-[60%] border p-6 text-white"
         handleClick={requestSuccess}
       >
         Check Your Register Info
       </Button>
-      <p className='py-5 text-medium font-bold text-center'>Register History</p>
-      <UserRegisterTableView columns={columns} data={data} totalItems={data.length} />
+      <p className="text-medium py-5 text-center font-bold">Register History</p>
+      <UserRegisterTableView
+        columns={columns}
+        data={data}
+        totalItems={data.length}
+      />
       <GameLink />
     </div>
   );

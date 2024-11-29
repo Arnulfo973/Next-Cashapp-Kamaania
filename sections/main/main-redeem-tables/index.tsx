@@ -14,20 +14,23 @@ export default function AdminMainTablePage() {
     async function fetchData() {
       try {
         setLoading(true);
-        
+
         const response = await fetch('/api/admin/totalredeem');
         const result = await response.json();
 
         const transformedData = result.data
-        .filter((item: any) => item.totalAmount !== 0)
-        .map((item: any) => ({
-          ...item,
-        }));
+          .filter((item: any) => item.totalAmount !== 0)
+          .map((item: any) => ({
+            ...item
+          }));
 
         setData(transformedData);
         setTotalData(result.totalCount);
-        
-        const sum = transformedData.reduce((acc: any, curr: any) => acc + (curr.totalAmount || 0), 0);
+
+        const sum = transformedData.reduce(
+          (acc: any, curr: any) => acc + (curr.totalAmount || 0),
+          0
+        );
         setCompleteAmount(sum);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -39,16 +42,20 @@ export default function AdminMainTablePage() {
     fetchData();
   }, []);
 
-
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="space-y-4 ">
-      <h1 className='text-lg text-center font-bold'>Player Deposit: {""} ${`${completeAmount}`}</h1>
-      <AdminMainTableView columns={columns} data={data} totalItems={data.length} />
+      <h1 className="text-center text-lg font-bold">
+        Player Deposit: {''} ${`${completeAmount}`}
+      </h1>
+      <AdminMainTableView
+        columns={columns}
+        data={data}
+        totalItems={data.length}
+      />
     </div>
   );
 }
-

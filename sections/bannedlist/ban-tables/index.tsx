@@ -5,12 +5,12 @@ import { columns } from './columns';
 import { useState, useEffect } from 'react';
 import BanTablePage from './ban-table';
 
-export default function BanTable() {
 
-  const [data, setData] = useState<AdminRegisterUsers[]>([]);
+export default function BanTable() {
+  const [data, setData] = useState<AdminRegisterUsers[] & UserRegister[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [searchParam, setSearchParam] = useState("");
-  const [selectCategory, setSelectCategory] = useState("tag");
+  const [searchParam, setSearchParam] = useState('');
+  const [selectCategory, setSelectCategory] = useState('tag');
 
   useEffect(() => {
     async function fetchData() {
@@ -19,7 +19,17 @@ export default function BanTable() {
 
         const UserResponse = await fetch('/api/admin/getbannedlist');
         const UserResult = await UserResponse.json();
-        const sortedData = UserResult.data.sort((a: any, b: any) => new Date(b.createdAt) - new Date(a.createdAt));
+        const sortedData = UserResult.data.sort((a: any, b: any) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          
+          if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) {
+            console.error('Invalid date:', a.createdAt, b.createdAt);
+            return 0; 
+          }
+          
+          return dateB.getTime() - dateA.getTime();
+        });
 
         setData(sortedData);
       } catch (error) {
@@ -31,7 +41,7 @@ export default function BanTable() {
     fetchData();
   }, []);
 
-  const filteredData = data.filter(item => {
+  const filteredData = data.filter((item) => {
     const param = searchParam.toLowerCase();
     switch (selectCategory) {
       case 'tag':
@@ -42,23 +52,23 @@ export default function BanTable() {
         return item.email?.toLowerCase().includes(param);
       case 'ip':
         return item.ip?.toLowerCase().includes(param);
-      case 'phonenumber':
-        return item.register?.phonenumber?.toLowerCase().includes(param);
+      // case 'phonenumber':
+      //   return item.register?.phonenumber?.toLowerCase().includes(param);
       default:
         return true;
     }
   });
 
   if (loading) {
-    return <div>Loading...</div>; // Replace with a spinner or loading message if needed
+    return <div>Loading...</div>; 
   }
 
   return (
     <div className="space-y-4 ">
-      <div className='flex justify-end'>
+      <div className="flex justify-end">
         <select
           onChange={(e) => setSelectCategory(e.target.value)}
-          className='border focus:border-[#DAAC95] h-9 p-2 text-sm rounded-md outline-none mt-3 bg-background'
+          className="mt-3 h-9 rounded-md border bg-background p-2 text-sm outline-none focus:border-[#DAAC95]"
         >
           <option value="tag">Tag Number</option>
           <option value="firstname">Name</option>
@@ -67,12 +77,16 @@ export default function BanTable() {
           <option value="phonenumber">Phone Number</option>
         </select>
         <input
-          className='border focus:border-[#DAAC95] h-9 p-2 text-sm rounded-md outline-none mt-3 bg-background'
-          placeholder='Search...'
+          className="mt-3 h-9 rounded-md border bg-background p-2 text-sm outline-none focus:border-[#DAAC95]"
+          placeholder="Search..."
           onChange={(e) => setSearchParam(e.target.value)}
         />
       </div>
-      <BanTablePage columns={columns} data={filteredData} totalItems={filteredData.length} />
+      <BanTablePage
+        columns={columns}
+        data={filteredData}
+        totalItems={filteredData.length}
+      />
     </div>
   );
 }

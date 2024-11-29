@@ -9,7 +9,7 @@ type pageProps = {
 };
 
 export const metadata = {
-  title: 'Kamaania'
+  title: 'Island House'
 };
 
 export default async function Page({ searchParams }: pageProps) {
@@ -18,7 +18,7 @@ export default async function Page({ searchParams }: pageProps) {
 
   return (
     <RoleMiddleware accessRight="user">
-      <UserPaypalPage/>
+      <UserPaypalPage />
     </RoleMiddleware>
   );
 }

@@ -9,7 +9,7 @@ type pageProps = {
 };
 
 export const metadata = {
-  title: 'Kamaania'
+  title: 'Island House'
 };
 
 export default async function Page({ searchParams }: pageProps) {
