@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import useSocket from '@/lib/socket';
 import { ColumnDef } from '@tanstack/react-table';
+import { useSearchParams } from 'next/navigation';
 
 interface SelectMultiIdData {
   id?: string;
@@ -15,11 +16,18 @@ interface SelectMultiIdData {
 
 export default function VerifyTable() {
   const { socket } = useSocket();
-  const [data, setData] = useState<AdminRegisterUsers[] & UserRegister[]>([]);
+  const [data, setData] = useState<(AdminRegisterUsers & UserRegister)[]>([]);
   const [totalData, setTotalData] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [multiIds, setMultiIds] = useState<SelectMultiIdData[]>([]);
   const [load, startTransition] = useTransition();
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -149,6 +157,9 @@ export default function VerifyTable() {
     }
   };
 
+  const offset = (page - 1) * limit;
+  const paginatedData = data.slice(offset, offset + limit);
+
   if (loading) {
     return <div>Loading...</div>; // Replace with a spinner or loading message if needed
   }
@@ -166,7 +177,7 @@ export default function VerifyTable() {
       </div>
       <VerifyTablePage
         columns={columns as ColumnDef<UserRegister, unknown>[]}
-        data={data} totalItems={data.length} />
+        data={paginatedData} totalItems={data.length} />
     </div>
   );
 }

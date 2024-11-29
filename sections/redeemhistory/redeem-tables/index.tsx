@@ -7,6 +7,7 @@ import AdminredeemHistoryTableView from './redeem-table';
 import useSocket from '@/lib/socket';
 import { toast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
+import { useSearchParams } from 'next/navigation';
 
 interface SelectMultiIdData {
   id?: string;
@@ -14,6 +15,7 @@ interface SelectMultiIdData {
 }
 
 export default function AdminredeemHistoryTable() {
+
   const { socket } = useSocket();
   const [data, setData] = useState<(Paymentredeems & AdminRegisterUsers)[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,6 +23,13 @@ export default function AdminredeemHistoryTable() {
   const [selectCategory, setSelectCategory] = useState('tag');
   const [multiIds, setMultiIds] = useState<SelectMultiIdData[]>([]);
   const [load, startTransition] = useTransition();
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -226,9 +235,13 @@ export default function AdminredeemHistoryTable() {
     }
   };
 
+  const offset = (page - 1) * limit;
+  const paginatedData = filteredData.slice(offset, offset + limit);
+
   if (loading) {
-    return <div>Loading...</div>; // Replace with a spinner or loading message if needed
+    return <div>Loading...</div>;
   }
+
 
   return (
     <div className="space-y-4 ">
@@ -265,7 +278,7 @@ export default function AdminredeemHistoryTable() {
       </div>
       <AdminredeemHistoryTableView
         columns={columns}
-        data={filteredData}
+        data={paginatedData}
         totalItems={filteredData.length}
       />
     </div>

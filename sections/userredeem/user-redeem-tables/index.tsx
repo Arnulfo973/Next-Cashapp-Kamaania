@@ -3,6 +3,7 @@ import { columns } from './columns';
 import { useState, useEffect } from 'react';
 import { Paymentredeems, UserRegister } from '@/constants/data';
 import UserredeemTableView from './user-redeem-table';
+import { useSearchParams } from 'next/navigation';
 
 const userInfoStr = localStorage.getItem('userinfo');
 const userInfo = userInfoStr ? JSON.parse(userInfoStr) : {};
@@ -12,6 +13,13 @@ export default function UserredeemTable() {
   const [totalData, setTotalData] = useState<number>(0); // Store total items for pagination
   const [loading, setLoading] = useState<boolean>(true);
   const [category, setCategory] = useState<string>('');
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -59,6 +67,9 @@ export default function UserredeemTable() {
     fetchData();
   }, [userInfo]);
 
+  const offset = (page - 1) * limit;
+  const paginatedData = data.slice(offset, offset + limit);
+
   if (category !== 'complete') {
     return (
       <div className="text-center text-xl font-bold text-red-500">
@@ -75,7 +86,7 @@ export default function UserredeemTable() {
     <div className="space-y-4 ">
       <UserredeemTableView
         columns={columns}
-        data={data}
+        data={paginatedData}
         totalItems={data.length}
       />
     </div>

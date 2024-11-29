@@ -6,6 +6,7 @@ import AdminWithdrawalTableView from './withdrawal-table';
 import useSocket from '@/lib/socket';
 import { toast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
+import { useSearchParams } from 'next/navigation';
 
 interface SelectMultiIdData {
   id?: string;
@@ -21,6 +22,13 @@ export default function AdminWithdrawalTable() {
   const [loading, setLoading] = useState<boolean>(true);
   const [multiIds, setMultiIds] = useState<SelectMultiIdData[]>([]);
   const [load, startTransition] = useTransition();
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -216,6 +224,9 @@ export default function AdminWithdrawalTable() {
     }
   };
 
+  const offset = (page - 1) * limit;
+  const paginatedData = data.slice(offset, offset + limit);
+
   if (loading) {
     return <div>Loading...</div>; // Replace with a spinner or loading message if needed
   }
@@ -232,7 +243,7 @@ export default function AdminWithdrawalTable() {
       </div>
       <AdminWithdrawalTableView
         columns={columns}
-        data={data}
+        data={paginatedData}
         totalItems={data.length}
       />
     </div>

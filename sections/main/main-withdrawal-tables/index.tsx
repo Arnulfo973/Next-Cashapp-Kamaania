@@ -3,6 +3,7 @@ import { columns } from './columns';
 import { useState, useEffect } from 'react';
 import { AdminRegisterUsers, PaymentWithdrawals } from '@/constants/data';
 import AdminMainWithdrawalTableView from './main-withdrawal-table';
+import { useSearchParams } from 'next/navigation';
 
 export default function AdminMainTablePage() {
   const [data, setData] = useState<(PaymentWithdrawals & AdminRegisterUsers)[]>(
@@ -11,6 +12,13 @@ export default function AdminMainTablePage() {
   const [totalData, setTotalData] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [completeAmount, setTotalAmount] = useState<number>(0);
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -44,6 +52,9 @@ export default function AdminMainTablePage() {
     fetchData();
   }, []);
 
+  const offset = (page - 1) * limit;
+  const paginatedData = data.slice(offset, offset + limit);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -55,7 +66,7 @@ export default function AdminMainTablePage() {
       </h1>
       <AdminMainWithdrawalTableView
         columns={columns}
-        data={data}
+        data={paginatedData}
         totalItems={data.length}
       />
     </div>

@@ -2,7 +2,7 @@
 import { AdminRegisterUsers, UserRegister } from '@/constants/data';
 import { columns } from './columns';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GameLink } from './game-link';
 import MyPageTableView from './mypage-table';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,13 @@ export default function MyPageTable() {
   const [tag, setTag] = useState<AdminRegisterUsers[]>([]);
   const [totalData, setTotalData] = useState<number>(0); // Store total items for pagination
   const [loading, setLoading] = useState<boolean>(true);
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -64,6 +71,9 @@ export default function MyPageTable() {
   // Filter the data for status "complete"
   const filteredData = data.filter((item) => item.status === 'complete');
 
+  const offset = (page - 1) * limit;
+  const paginatedData = filteredData.slice(offset, offset + limit);
+
   return (
     <div className="space-y-4">
       <p className="text-md ml-10 font-medium">Your Tag Number</p>
@@ -71,7 +81,7 @@ export default function MyPageTable() {
       <p className="text-medium py-5 text-center font-bold">Login Info</p>
       <MyPageTableView
         columns={columns}
-        data={filteredData}
+        data={paginatedData}
         totalItems={filteredData.length}
       />
       <div className="flex justify-center py-8">

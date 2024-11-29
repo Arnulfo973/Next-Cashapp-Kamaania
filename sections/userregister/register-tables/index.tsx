@@ -4,7 +4,7 @@ import { columns } from './columns';
 import { useState, useEffect } from 'react';
 import UserRegisterTableView from './user-register-table';
 import UserRegistrationForm from './user-register-fron';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { GameLink } from './game-link';
 
@@ -13,9 +13,16 @@ const userInfo = userInfoStr ? JSON.parse(userInfoStr) : {};
 
 export default function UserRegisterTable() {
   const router = useRouter();
-  const [data, setData] = useState<AdminRegisterUsers[] & UserRegister[]>([]);
+  const [data, setData] = useState<(AdminRegisterUsers & UserRegister)[]>([]);
   const [totalData, setTotalData] = useState<number>(0); 
   const [loading, setLoading] = useState<boolean>(true);
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -51,6 +58,9 @@ export default function UserRegisterTable() {
     fetchData();
   }, [userInfo]);
 
+  const offset = (page - 1) * limit;
+  const paginatedData = data.slice(offset, offset + limit);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -71,7 +81,7 @@ export default function UserRegisterTable() {
       <p className="text-medium py-5 text-center font-bold">Register History</p>
       <UserRegisterTableView
         columns={columns}
-        data={data}
+        data={paginatedData}
         totalItems={data.length}
       />
       <GameLink />

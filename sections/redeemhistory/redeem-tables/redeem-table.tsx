@@ -55,7 +55,7 @@ export default function UserWithdrawalTableView<TData, TValue>({
   );
 
   const paginationState = {
-    pageIndex: currentPage - 1, // zero-based index for React Table
+    pageIndex: currentPage - 1,
     pageSize: pageSize
   };
 

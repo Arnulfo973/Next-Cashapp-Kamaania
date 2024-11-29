@@ -4,6 +4,7 @@ import { AdminRegisterUsers, UserRegister } from '@/constants/data';
 import { columns } from './columns';
 import { useState, useEffect } from 'react';
 import BanTablePage from './ban-table';
+import { useSearchParams } from 'next/navigation';
 
 
 export default function BanTable() {
@@ -11,6 +12,13 @@ export default function BanTable() {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchParam, setSearchParam] = useState('');
   const [selectCategory, setSelectCategory] = useState('tag');
+
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const limitParam = searchParams.get('limit');
+  
+  const page = Number(pageParam? pageParam : 1);
+  const limit = Number(limitParam? limitParam : 10);
 
   useEffect(() => {
     async function fetchData() {
@@ -59,6 +67,9 @@ export default function BanTable() {
     }
   });
 
+  const offset = (page - 1) * limit;
+  const paginatedData = filteredData.slice(offset, offset + limit);
+
   if (loading) {
     return <div>Loading...</div>; 
   }
@@ -84,7 +95,7 @@ export default function BanTable() {
       </div>
       <BanTablePage
         columns={columns}
-        data={filteredData}
+        data={paginatedData}
         totalItems={filteredData.length}
       />
     </div>
